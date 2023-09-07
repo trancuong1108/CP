@@ -70,16 +70,38 @@ void subtask2()
     }
     cout << cnt;
 }
+void dfs(int u)
+{
+    if (mark[u]) return;
+    mark[u] = true;
+    for (int i = 0; i < m; ++i) {
+        if (bit(u, i) && !mark[u ^ (1 << i)]) dfs(u ^ (1 << i));
+    }
+    if (pos[u]) dfs(((1 << m) - 1) ^ u);
+}
+void subtask3()
+{
+    for (int i = 1; i <= n; ++i) pos[a[i]] = i;
+    int res = 0;
+    int mask = (1 << m) - 1;
+    for (int i = 1; i <= n; ++i) {
+        if (!mark[a[i]]) {
+            ++res;
+            dfs(mask ^ a[i]);
+        }
+    }
+    cout << res;
+}
 signed main() {
-    #ifndef ONLINE_JUDGE
-    freopen("TASK.inp", "r", stdin);
-    freopen("TASK.txt", "w", stdout);
-    #endif
     ios_base::sync_with_stdio(false);
     cin.tie(0); cout.tie(0);
+    freopen("COUNT.INP", "r", stdin);
+    freopen("COUNT.OUT", "w", stdout);
     cin >> n >> m;
     for (int i = 1; i <= n; ++i) cin >> a[i];
-    subtask2();
+    if (n <= 1000 && m <= 20) subtask1();
+    else if (m <= 15) subtask2();
+    else subtask3();
     return 0;
 }
 
