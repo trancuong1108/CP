@@ -15,24 +15,9 @@ void _print(T t, V... v) {__print(t); if (sizeof...(v)) cerr << ", "; _print(v..
 const int INF = 1e9;
 const int MOD = 1e9 + 7;
 const int maxN = 1e5 + 5;
-int n, m, deg[maxN], par[maxN];
+int n, m, deg[maxN], edge[maxN];
 vector<pair<int, int>> adj[maxN];
 bool visited[maxN];
-void make_set()
-{
-    for (int i = 1; i <= n; ++i) par[i] = i;
-}
-int find_set(int v)
-{
-    return v != par[v] ? par[v] = find_set(par[v]) : v;
-}
-void Union(int u, int v)
-{
-    u = find_set(u);
-    v = find_set(v);
-    if (u == v) return;
-    par[u] = v;
-}
 list<int> find_Euler(int u)
 {
     list<int> res;
@@ -63,6 +48,12 @@ void findPath()
         return;
     }
     list<int> path = find_Euler(1);
+    for (int i = 1; i <= m; ++i) {
+        if (!visited[edge[i]]) {
+            cout << "NO\n";
+            return;
+        }
+    }
     cout << "YES\n";
     for (auto it = path.begin(); it != path.end(); it++) cout << (*it) - 1 << ' ';
 }
@@ -75,24 +66,19 @@ signed main() {
     ios_base::sync_with_stdio(false);
     cin.tie(0); cout.tie(0);
     cin >> n >> m;
-    make_set();
-    for (int i = 0; i < m; ++i) {
+    map<pair<int, int>, int> mp;
+    for (int i = 1; i <= m; ++i) {
         int u, v;
         cin >> u >> v;
         ++u;
         ++v;
-        Union(u, v);
-        adj[u].emplace_back(v, i);
-        adj[v].emplace_back(u, i);
+        if (u > v) swap(u, v);
+        if (mp[{u, v}] == 0) mp[{u, v}] = i;
+        edge[i] = mp[{u, v}];
+        adj[u].emplace_back(v, mp[{u, v}]);
+        adj[v].emplace_back(u, mp[{u, v}]);
         deg[u]++;
         deg[v]++;
-    }
-    int cur = find_set(1);
-    for (int i = 2; i <= n; ++i) {
-        if (find_set(i) != cur) {
-            cout << "NO\n";
-            return 0;
-        }
     }
     findPath();
     return 0;
