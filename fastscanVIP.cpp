@@ -1,35 +1,32 @@
 namespace IO {
-    const int BUFSIZE = 1<<14;
-    char buf[BUFSIZE + 1], *inp = buf;
-
-    bool reacheof;
+    const int BUF_SIZE = 1 << 20;
+    char buf[BUF_SIZE + 1], *inp = buf;
+    bool en = false;
+    int tmp;
     char get_char() {
-        if (!*inp && !reacheof) {
+        if (!*inp && !en) {
             memset(buf, 0, sizeof buf);
-            int tmp = fread(buf, 1, BUFSIZE, stdin);
-            if (tmp != BUFSIZE) reacheof = true;
+            tmp = fread(buf, 1, BUF_SIZE, stdin);
+            if (tmp != BUF_SIZE) en = true;
             inp = buf;
         }
         return *inp++;
     }
-    template<typename T>
-    T get() {
-        int neg = 0;
-        T res = 0;
-        char c = get_char();
-        while (!(c >= '0' && c <= '9') && c != '-' && c != '+') c = get_char();
-        if (c == '+') { neg = 0; }
-        else if (c == '-') { neg = 1; }
-        else res = c - '0';
-
-        c = get_char();
-        while (c >= '0' && c <= '9') {
-            res = res * 10 + (c - '0');
-            c = get_char();
-        }
-        return neg ? -res : res;
+}
+template<typename T>
+void read (T &x) {
+    x = 0;
+    char c;
+    bool neg = false;
+    c = IO::get_char();
+    if (c == '-') neg = true;
+    else x = c - '0';
+    for (c = IO::get_char(); (c >= '0' && c <= '9'); c = IO::get_char()) {
+        x = (x << 3) + (x << 1) + (c - '0');
     }
-};
-int read() {
-    return IO::get<int>();
+    if (neg) x = -x;
+}
+template<typename T, typename ...Ts>
+void read(T& x, Ts& ...args) {
+    read(x), read(args...);
 }
